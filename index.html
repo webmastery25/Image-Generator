@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website AI Media Generator - Pro Styles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow: hidden;
+        }
+
+        .dark-gradient {
+            background: radial-gradient(circle at top right, #1E293B 0%, #0F172A 100%);
+        }
+
+        .side-panel {
+            background: #1E293B;
+            border-right: 1px solid #334155;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+        }
+
+        .accent-text {
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #1E293B 25%, #334155 50%, #1E293B 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .image-card {
+            background: #1E293B;
+            border: 1px solid #334155;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+            border-color: #3B82F6;
+        }
+
+        .card-actions {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .image-card:hover .card-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+
+        .suggestion-chip {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #334155;
+            border: 1px solid #475569;
+            color: #94A3B8;
+        }
+        .suggestion-chip:hover {
+            background: #2563EB;
+            border-color: #2563EB;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .input-focus:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .toggle-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #94A3B8;
+        }
+        .toggle-btn.active {
+            background-color: #2563EB;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .pulse-soft {
+            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.3; } }
+    </style>
+</head>
+<body class="dark-gradient h-screen flex overflow-hidden">
+    
+    <aside class="w-[400px] flex flex-col side-panel z-20">
+        <div class="p-8 pb-6">
+            <h1 class="text-2xl font-800 tracking-tight accent-text">STUDIO MULTI<span class="text-slate-500 text-[10px] align-top ml-2 font-medium tracking-[0.2em] uppercase">AI Generator</span></h1>
+            <p class="text-slate-500 text-[10px] uppercase tracking-[0.2em] mt-1 font-bold">Media Production Console</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-8 py-2 space-y-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Output Format</label>
+                <div class="flex bg-[#0F172A] p-1 rounded-xl border border-slate-800">
+                    <button id="mode-image" class="toggle-btn active flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg">Image</button>
+                    <button id="mode-video" class="toggle-btn flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg">Video</button>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Style Profile</label>
+                <select id="style-preset" class="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 outline-none input-focus transition-all">
+                    <optgroup label="Realism">
+                        <option value="ultra-realistic studio, soft shadows, 8k professional" selected>Clean Studio</option>
+                        <option value="cinematic lighting, dramatic atmosphere, high contrast">Cinematic</option>
+                        <option value="natural sunlight, minimalist aesthetic, sharp focus">Natural Light</option>
+                    </optgroup>
+                    <optgroup label="Digital Art">
+                        <option value="minimalist 3D icon, claymorphism, soft volumetric lighting">3D Clay</option>
+                        <option value="modern SaaS web design illustration, flat vector">SaaS Vector</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Aspect Ratio</label>
+                <select id="size-preset" class="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 outline-none input-focus transition-all">
+                    <option value="1:1">1:1 Square</option>
+                    <option value="16:9" selected>16:9 Widescreen</option>
+                    <option value="9:16">9:16 Vertical</option>
+                </select>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex justify-between items-end">
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prompt</label>
+                    <button id="clear-btn" class="text-[9px] text-slate-500 hover:text-red-400 font-bold uppercase tracking-widest transition-colors">Clear All</button>
+                </div>
+                <textarea id="items-input" class="w-full h-32 bg-[#0F172A] border border-slate-700 rounded-2xl p-4 text-sm text-slate-200 placeholder:text-slate-600 resize-none outline-none input-focus transition-all" placeholder="E.g. A futuristic robot playing chess in a minimalist room..."></textarea>
+                
+                <div class="flex flex-wrap gap-2">
+                    <div class="suggestion-chip px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider" data-prompt="Liquid metallic waves flowing slowly, blue and chrome, 4k cinematic">Flowing Metal</div>
+                    <div class="suggestion-chip px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider" data-prompt="Macro shot of a robotic eye blinking, mechanical iris, sci-fi">Bot Blink</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 bg-[#0F172A]/50 border-t border-slate-800">
+            <button id="start-btn" class="w-full bg-blue-600 hover:bg-[#2563EB] text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/40 uppercase tracking-widest text-xs flex items-center justify-center gap-3 active:scale-[0.98]">
+                <span id="btn-text">Generate Asset</span>
+                <div id="btn-spinner" class="hidden w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+        <div class="h-20 border-b border-slate-800 flex items-center justify-between px-10 z-10 bg-[#0F172A]/80 backdrop-blur-md">
+            <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-500">Rendering Canvas</span>
+            <div id="active-status" class="hidden flex items-center gap-3 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20">
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">AI Engine Active</span>
+            </div>
+        </div>
+
+        <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700">
+            <div class="w-48 h-48 bg-[#1E293B] border border-slate-800 rounded-full flex items-center justify-center pulse-soft shadow-2xl">
+                <svg class="w-16 h-16 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2-2v8a2 2 0 002 2z" /></svg>
+            </div>
+            <p class="mt-8 text-[11px] text-slate-600 uppercase tracking-[0.4em] font-bold">Ready for rendering</p>
+        </div>
+
+        <div id="gallery" class="flex-1 overflow-y-auto p-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 content-start"></div>
+    </main>
+
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/80 z-[100] hidden flex items-center justify-center p-12 backdrop-blur-md">
+        <div class="max-w-5xl w-full bg-[#1E293B] rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-800">
+            <div id="modal-content" class="flex-1 bg-[#0F172A] flex items-center justify-center min-h-[400px]"></div>
+            <div class="w-full md:w-96 p-10 flex flex-col justify-center space-y-6">
+                <div>
+                    <h3 id="modal-title" class="text-2xl font-800 text-white leading-tight mb-2">Asset Preview</h3>
+                    <p id="modal-desc" class="text-sm text-slate-400 leading-relaxed">Generated high-fidelity asset for digital experiences.</p>
+                </div>
+                <div class="h-px bg-slate-800 w-full"></div>
+                <div class="space-y-3">
+                    <button id="modal-dl" class="w-full py-4 rounded-2xl bg-blue-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-[#2563EB] transition-all shadow-lg">Download</button>
+                    <button id="modal-close" class="w-full py-4 rounded-2xl border border-slate-700 text-slate-400 text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "";
+        const IMAGE_MODEL_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict";
+        const VIDEO_MODEL_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent";
+
+        let currentMode = 'image';
+
+        const itemsInput = document.getElementById('items-input');
+        const startBtn = document.getElementById('start-btn');
+        const gallery = document.getElementById('gallery');
+        const emptyState = document.getElementById('empty-state');
+        const statusEl = document.getElementById('active-status');
+
+        document.getElementById('mode-image').onclick = (e) => {
+            currentMode = 'image';
+            e.target.classList.add('active');
+            document.getElementById('mode-video').classList.remove('active');
+        };
+        document.getElementById('mode-video').onclick = (e) => {
+            currentMode = 'video';
+            e.target.classList.add('active');
+            document.getElementById('mode-image').classList.remove('active');
+        };
+
+        document.querySelectorAll('.suggestion-chip').forEach(chip => {
+            chip.onclick = () => {
+                const prompt = chip.getAttribute('data-prompt');
+                itemsInput.value += (itemsInput.value ? '\n' : '') + prompt;
+            };
+        });
+
+        async function fetchWithRetry(url, payload, retries = 5) {
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(`${url}?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) return await res.json();
+                    const errData = await res.json();
+                    console.error("API Error Detail:", errData);
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                }
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+            throw new Error("API Connection Failed");
+        }
+
+        function createSkeletonCard() {
+            const card = document.createElement('div');
+            card.className = "image-card flex flex-col gap-4 p-5 rounded-[32px]";
+            card.innerHTML = `
+                <div class="skeleton aspect-[16/9] rounded-2xl"></div>
+                <div class="flex justify-between items-center px-1">
+                    <div class="h-2 w-24 skeleton rounded"></div>
+                    <div class="h-6 w-6 skeleton rounded-full"></div>
+                </div>
+            `;
+            return card;
+        }
+
+        async function generateItem(promptText) {
+            const skeleton = createSkeletonCard();
+            gallery.prepend(skeleton);
+
+            const style = document.getElementById('style-preset').value;
+            const ratio = document.getElementById('size-preset').value;
+            const fullPrompt = `Subject: ${promptText}. Style: ${style}. Aspect Ratio: ${ratio}. 8k professional production quality.`;
+
+            try {
+                if (currentMode === 'image') {
+                    const payload = { instances: { prompt: fullPrompt }, parameters: { sampleCount: 1 } };
+                    const data = await fetchWithRetry(IMAGE_MODEL_URL, payload);
+                    const base64 = data.predictions?.[0]?.bytesBase64Encoded;
+                    if (base64) renderActualCard(skeleton, promptText, `data:image/png;base64,${base64}`, 'image');
+                    else throw new Error("Image generation failed");
+                } else {
+                    // Improved Video Generation Payload
+                    const payload = {
+                        model: "gemini-2.5-flash-image-preview",
+                        contents: [{ parts: [{ text: `Generate a 4-second cinematic video with smooth motion of: ${fullPrompt}` }] }],
+                        generationConfig: { responseModalities: ['IMAGE'] }
+                    };
+                    const data = await fetchWithRetry(VIDEO_MODEL_URL, payload);
+                    const base64Part = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                    
+                    if (base64Part && base64Part.inlineData.data) {
+                        const mime = base64Part.inlineData.mimeType || "video/mp4";
+                        renderActualCard(skeleton, promptText, `data:${mime};base64,${base64Part.inlineData.data}`, 'video');
+                    } else {
+                        throw new Error("Video generation failed - no output data");
+                    }
+                }
+            } catch (err) {
+                skeleton.innerHTML = `
+                    <div class="aspect-[16/9] flex flex-col items-center justify-center text-red-400 bg-slate-900/50 rounded-2xl p-6 text-center border border-red-500/20">
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Error</span>
+                        <span class="text-[9px] mt-1 opacity-60">Generation failed</span>
+                    </div>`;
+            }
+        }
+
+        function renderActualCard(skeleton, title, src, type) {
+            const mediaHtml = type === 'image' 
+                ? `<img src="${src}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">`
+                : `<video src="${src}" class="w-full h-full object-cover" autoplay loop muted playsinline></video>`;
+
+            skeleton.innerHTML = `
+                <div class="relative aspect-[16/9] rounded-2xl overflow-hidden group cursor-pointer shadow-inner bg-[#0F172A]">
+                    ${mediaHtml}
+                    <div class="card-actions absolute inset-0 bg-blue-600/10 flex items-center justify-center">
+                        <button class="preview-trigger p-4 bg-[#1E293B] text-blue-400 rounded-3xl shadow-xl hover:bg-[#2563EB] hover:text-white transition-all scale-90 group-hover:scale-100">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-col px-1">
+                    <span class="text-[11px] font-bold text-white uppercase tracking-tight truncate">${title}</span>
+                    <span class="text-[9px] font-medium text-blue-400 uppercase tracking-widest">${type.toUpperCase()} ASSET</span>
+                </div>
+            `;
+            skeleton.querySelector('.preview-trigger').onclick = () => showPreview(title, src, type);
+        }
+
+        function showPreview(title, src, type) {
+            const modal = document.getElementById('preview-modal');
+            const container = document.getElementById('modal-content');
+            container.innerHTML = type === 'image' 
+                ? `<img src="${src}" class="max-w-full max-h-full object-contain">`
+                : `<video src="${src}" class="max-w-full max-h-full object-contain" controls autoplay loop></video>`;
+            
+            document.getElementById('modal-title').textContent = title;
+            modal.classList.remove('hidden');
+
+            document.getElementById('modal-dl').onclick = () => {
+                const link = document.createElement('a');
+                link.href = src;
+                link.download = `asset-${Date.now()}.${type === 'image' ? 'png' : 'mp4'}`;
+                link.click();
+            };
+        }
+
+        document.getElementById('modal-close').onclick = () => document.getElementById('preview-modal').classList.add('hidden');
+
+        startBtn.onclick = async () => {
+            const prompts = itemsInput.value.split('\n').filter(l => l.trim());
+            if (!prompts.length) return;
+            emptyState.style.opacity = '0';
+            statusEl.classList.remove('hidden');
+            startBtn.disabled = true;
+            document.getElementById('btn-spinner').classList.remove('hidden');
+            document.getElementById('btn-text').textContent = "Rendering...";
+            
+            for (const prompt of prompts) await generateItem(prompt);
+            
+            statusEl.classList.add('hidden');
+            startBtn.disabled = false;
+            document.getElementById('btn-spinner').classList.add('hidden');
+            document.getElementById('btn-text').textContent = "Generate Asset";
+        };
+
+        document.getElementById('clear-btn').onclick = () => {
+            itemsInput.value = "";
+            gallery.innerHTML = "";
+            emptyState.style.opacity = '1';
+        };
+    </script>
+</body>
+</html>
