@@ -10,33 +10,45 @@
   <input id="prompt" placeholder="Enter prompt" style="padding:10px;width:300px" />
   <br><br>
 
-  <button onclick="generateImage()" style="padding:10px 20px">Generate</button>
+<button onclick="generateImage()">Generate</button>
 
   <br><br>
 
   <img id="result" width="400"/>
 
-  <script>
-   const res = await fetch("/api/generate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ prompt })
-});
+<script>
+async function generateImage() {
 
-let data;
+  const prompt = document.getElementById("prompt").value;
 
-try {
-  data = await res.json();
-} catch {
-  throw new Error("Server returned invalid response");
+  if (!prompt) {
+    alert("Enter prompt");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed");
+    }
+
+    document.getElementById("result").src = data.imageUrl;
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
 }
-
-if (!res.ok) {
-  throw new Error(data.error || "Failed");
-}
-  </script>
+</script>
 
 </body>
 </html>
