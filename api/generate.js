@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { prompt } = req.body;
 
     if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
+      return res.status(400).json({ error: "Prompt required" });
     }
 
     const result = await openai.images.generate({
@@ -18,14 +18,15 @@ export default async function handler(req, res) {
       size: "1024x1024",
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       imageUrl: result.data[0].url,
     });
 
   } catch (err) {
-    console.error("ERROR:", err);
-    res.status(500).json({
-      error: err.message || "Server error",
+    console.error("SERVER ERROR:", err);
+
+    return res.status(500).json({
+      error: err.message || "Internal server error",
     });
   }
 }
