@@ -17,24 +17,36 @@
   <img id="result" width="400"/>
 
   <script>
-   const res = await fetch("/api/generate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ prompt })
-});
+async function generateImage() {   // ✅ async added
 
-let data;
+  const prompt = document.getElementById("prompt").value
 
-try {
-  data = await res.json();
-} catch {
-  throw new Error("Server returned invalid response");
-}
+  if (!prompt) {
+    alert("Enter prompt")
+    return
+  }
 
-if (!res.ok) {
-  throw new Error(data.error || "Failed");
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed")
+    }
+
+    document.getElementById("result").src = data.imageUrl
+
+  } catch (err) {
+    console.error(err)
+    alert("Error: " + err.message)
+  }
 }
   </script>
 
