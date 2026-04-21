@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Multi - AI Image Generator</title>
+    <title>Website AI Media Generator - Pro Styles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -102,26 +102,6 @@
             animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.3; } }
-
-        .alert-box {
-            background: #DC2626/10;
-            border: 1px solid #DC2626/30;
-            color: #FCA5A5;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .success-box {
-            background: #16A34A/10;
-            border: 1px solid #16A34A/30;
-            color: #86EFAC;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
     </style>
 </head>
 <body class="dark-gradient h-screen flex overflow-hidden">
@@ -129,16 +109,16 @@
     <aside class="w-[400px] flex flex-col side-panel z-20">
         <div class="p-8 pb-6">
             <h1 class="text-2xl font-800 tracking-tight accent-text">STUDIO MULTI<span class="text-slate-500 text-[10px] align-top ml-2 font-medium tracking-[0.2em] uppercase">AI Generator</span></h1>
-            <p class="text-slate-500 text-[10px] uppercase tracking-[0.2em] mt-1 font-bold">Powered by OpenAI DALL-E 3</p>
+            <p class="text-slate-500 text-[10px] uppercase tracking-[0.2em] mt-1 font-bold">Media Production Console</p>
         </div>
 
         <div class="flex-1 overflow-y-auto px-8 py-2 space-y-6">
-            <div id="api-config" class="success-box hidden">
-                ✓ Connected to backend API
-            </div>
-
-            <div id="api-error" class="alert-box hidden">
-                ⚠️ <span id="error-msg"></span>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Output Format</label>
+                <div class="flex bg-[#0F172A] p-1 rounded-xl border border-slate-800">
+                    <button id="mode-image" class="toggle-btn active flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg">Image</button>
+                    <button id="mode-video" class="toggle-btn flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg">Video</button>
+                </div>
             </div>
 
             <div class="space-y-2">
@@ -175,14 +155,13 @@
                 <div class="flex flex-wrap gap-2">
                     <div class="suggestion-chip px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider" data-prompt="Liquid metallic waves flowing slowly, blue and chrome, 4k cinematic">Flowing Metal</div>
                     <div class="suggestion-chip px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider" data-prompt="Macro shot of a robotic eye blinking, mechanical iris, sci-fi">Bot Blink</div>
-                    <div class="suggestion-chip px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider" data-prompt="Ethereal aurora borealis dancing over snowy mountains at night">Aurora Lights</div>
                 </div>
             </div>
         </div>
 
         <div class="p-8 bg-[#0F172A]/50 border-t border-slate-800">
             <button id="start-btn" class="w-full bg-blue-600 hover:bg-[#2563EB] text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/40 uppercase tracking-widest text-xs flex items-center justify-center gap-3 active:scale-[0.98]">
-                <span id="btn-text">Generate Image</span>
+                <span id="btn-text">Generate Asset</span>
                 <div id="btn-spinner" class="hidden w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
             </button>
         </div>
@@ -212,8 +191,8 @@
             <div id="modal-content" class="flex-1 bg-[#0F172A] flex items-center justify-center min-h-[400px]"></div>
             <div class="w-full md:w-96 p-10 flex flex-col justify-center space-y-6">
                 <div>
-                    <h3 id="modal-title" class="text-2xl font-800 text-white leading-tight mb-2">Image Preview</h3>
-                    <p id="modal-desc" class="text-sm text-slate-400 leading-relaxed">Generated with OpenAI DALL-E 3</p>
+                    <h3 id="modal-title" class="text-2xl font-800 text-white leading-tight mb-2">Asset Preview</h3>
+                    <p id="modal-desc" class="text-sm text-slate-400 leading-relaxed">Generated high-fidelity asset for digital experiences.</p>
                 </div>
                 <div class="h-px bg-slate-800 w-full"></div>
                 <div class="space-y-3">
@@ -225,45 +204,28 @@
     </div>
 
     <script>
-        // Configuration
-        const API_BASE_URL = window.location.origin; // For local dev: http://localhost:3000
-        
-        // For production, update this to your deployed backend URL:
-        // const API_BASE_URL = 'https://your-vercel-app.vercel.app';
+        const apiKey = "AQ.Ab8RN6LmZr5RM_tLL4Ws5ECvDgnXhgVSgT1wIOWeMN_dLX_8hg";
+        const IMAGE_MODEL_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict";
+        const VIDEO_MODEL_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent";
 
         let currentMode = 'image';
-        
+
         const itemsInput = document.getElementById('items-input');
         const startBtn = document.getElementById('start-btn');
         const gallery = document.getElementById('gallery');
         const emptyState = document.getElementById('empty-state');
         const statusEl = document.getElementById('active-status');
-        const apiConfigEl = document.getElementById('api-config');
-        const apiErrorEl = document.getElementById('api-error');
-        const errorMsgEl = document.getElementById('error-msg');
 
-        // Check API connection on load
-        async function checkApiConnection() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/health`);
-                if (response.ok) {
-                    apiConfigEl.classList.remove('hidden');
-                    return true;
-                }
-            } catch (e) {
-                showApiError('Cannot connect to backend API. Make sure server is running.');
-                return false;
-            }
-        }
-
-        function showApiError(message) {
-            errorMsgEl.textContent = message;
-            apiErrorEl.classList.remove('hidden');
-        }
-
-        function hideApiError() {
-            apiErrorEl.classList.add('hidden');
-        }
+        document.getElementById('mode-image').onclick = (e) => {
+            currentMode = 'image';
+            e.target.classList.add('active');
+            document.getElementById('mode-video').classList.remove('active');
+        };
+        document.getElementById('mode-video').onclick = (e) => {
+            currentMode = 'video';
+            e.target.classList.add('active');
+            document.getElementById('mode-image').classList.remove('active');
+        };
 
         document.querySelectorAll('.suggestion-chip').forEach(chip => {
             chip.onclick = () => {
@@ -271,6 +233,27 @@
                 itemsInput.value += (itemsInput.value ? '\n' : '') + prompt;
             };
         });
+
+        async function fetchWithRetry(url, payload, retries = 5) {
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(`${url}?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) return await res.json();
+                    const errData = await res.json();
+                    console.error("API Error Detail:", errData);
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                }
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+            throw new Error("API Connection Failed");
+        }
 
         function createSkeletonCard() {
             const card = document.createElement('div');
@@ -291,43 +274,45 @@
 
             const style = document.getElementById('style-preset').value;
             const ratio = document.getElementById('size-preset').value;
-            const fullPrompt = `${promptText}. Style: ${style}`;
+            const fullPrompt = `Subject: ${promptText}. Style: ${style}. Aspect Ratio: ${ratio}. 8k professional production quality.`;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/generate-image`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        prompt: fullPrompt,
-                        style: style,
-                        size: ratio
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Image generation failed');
+                if (currentMode === 'image') {
+                    const payload = { instances: { prompt: fullPrompt }, parameters: { sampleCount: 1 } };
+                    const data = await fetchWithRetry(IMAGE_MODEL_URL, payload);
+                    const base64 = data.predictions?.[0]?.bytesBase64Encoded;
+                    if (base64) renderActualCard(skeleton, promptText, `data:image/png;base64,${base64}`, 'image');
+                    else throw new Error("Image generation failed");
+                } else {
+                    // Improved Video Generation Payload
+                    const payload = {
+                        model: "gemini-2.5-flash-image-preview",
+                        contents: [{ parts: [{ text: `Generate a 4-second cinematic video with smooth motion of: ${fullPrompt}` }] }],
+                        generationConfig: { responseModalities: ['IMAGE'] }
+                    };
+                    const data = await fetchWithRetry(VIDEO_MODEL_URL, payload);
+                    const base64Part = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                    
+                    if (base64Part && base64Part.inlineData.data) {
+                        const mime = base64Part.inlineData.mimeType || "video/mp4";
+                        renderActualCard(skeleton, promptText, `data:${mime};base64,${base64Part.inlineData.data}`, 'video');
+                    } else {
+                        throw new Error("Video generation failed - no output data");
+                    }
                 }
-
-                const data = await response.json();
-                renderActualCard(skeleton, promptText, data.imageUrl, 'image');
-                hideApiError();
-
             } catch (err) {
-                console.error('Generation error:', err);
                 skeleton.innerHTML = `
                     <div class="aspect-[16/9] flex flex-col items-center justify-center text-red-400 bg-slate-900/50 rounded-2xl p-6 text-center border border-red-500/20">
                         <span class="text-[10px] font-bold uppercase tracking-widest">Error</span>
-                        <span class="text-[9px] mt-1 opacity-60">${err.message}</span>
+                        <span class="text-[9px] mt-1 opacity-60">Generation failed</span>
                     </div>`;
-                showApiError(err.message);
             }
         }
 
         function renderActualCard(skeleton, title, src, type) {
-            const mediaHtml = `<img src="${src}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'text-red-400 text-center\\'>Failed to load image</div>'">`;
+            const mediaHtml = type === 'image' 
+                ? `<img src="${src}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">`
+                : `<video src="${src}" class="w-full h-full object-cover" autoplay loop muted playsinline></video>`;
 
             skeleton.innerHTML = `
                 <div class="relative aspect-[16/9] rounded-2xl overflow-hidden group cursor-pointer shadow-inner bg-[#0F172A]">
@@ -340,16 +325,18 @@
                 </div>
                 <div class="flex flex-col px-1">
                     <span class="text-[11px] font-bold text-white uppercase tracking-tight truncate">${title}</span>
-                    <span class="text-[9px] font-medium text-blue-400 uppercase tracking-widest">DALL-E 3</span>
+                    <span class="text-[9px] font-medium text-blue-400 uppercase tracking-widest">${type.toUpperCase()} ASSET</span>
                 </div>
             `;
-            skeleton.querySelector('.preview-trigger').onclick = () => showPreview(title, src);
+            skeleton.querySelector('.preview-trigger').onclick = () => showPreview(title, src, type);
         }
 
-        function showPreview(title, src) {
+        function showPreview(title, src, type) {
             const modal = document.getElementById('preview-modal');
             const container = document.getElementById('modal-content');
-            container.innerHTML = `<img src="${src}" class="max-w-full max-h-full object-contain" alt="${title}">`;
+            container.innerHTML = type === 'image' 
+                ? `<img src="${src}" class="max-w-full max-h-full object-contain">`
+                : `<video src="${src}" class="max-w-full max-h-full object-contain" controls autoplay loop></video>`;
             
             document.getElementById('modal-title').textContent = title;
             modal.classList.remove('hidden');
@@ -357,7 +344,7 @@
             document.getElementById('modal-dl').onclick = () => {
                 const link = document.createElement('a');
                 link.href = src;
-                link.download = `ai-generated-${Date.now()}.png`;
+                link.download = `asset-${Date.now()}.${type === 'image' ? 'png' : 'mp4'}`;
                 link.click();
             };
         }
@@ -367,22 +354,18 @@
         startBtn.onclick = async () => {
             const prompts = itemsInput.value.split('\n').filter(l => l.trim());
             if (!prompts.length) return;
-            
             emptyState.style.opacity = '0';
             statusEl.classList.remove('hidden');
             startBtn.disabled = true;
             document.getElementById('btn-spinner').classList.remove('hidden');
-            document.getElementById('btn-text').textContent = "Generating...";
+            document.getElementById('btn-text').textContent = "Rendering...";
             
-            for (const prompt of prompts) {
-                await generateItem(prompt);
-                await new Promise(r => setTimeout(r, 1000)); // Delay between generations
-            }
+            for (const prompt of prompts) await generateItem(prompt);
             
             statusEl.classList.add('hidden');
             startBtn.disabled = false;
             document.getElementById('btn-spinner').classList.add('hidden');
-            document.getElementById('btn-text').textContent = "Generate Image";
+            document.getElementById('btn-text').textContent = "Generate Asset";
         };
 
         document.getElementById('clear-btn').onclick = () => {
@@ -390,9 +373,6 @@
             gallery.innerHTML = "";
             emptyState.style.opacity = '1';
         };
-
-        // Check API on page load
-        checkApiConnection();
     </script>
 </body>
 </html>
